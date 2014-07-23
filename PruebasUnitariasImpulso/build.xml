@@ -1,0 +1,53 @@
+<project name="PruebasUnitarias" default="runTests" basedir=".">
+
+	<property name="sourceFolder" value="src"/>
+	<property name="destFolder" value="bin"/>
+	<property name="testFolder" value="test"/>
+	<property name="junitJar" value="/Applications/eclipse/plugins/org.junit_4.11.0.v201303080030/junit.jar"/>
+	<property name="testResultsFolder" value="testResults"/>
+	<property name="mockitoJar" value="libs/mockito-all-1.9.5.jar"/>
+	
+	<!-- task: definir un target para hacer limpieza y creación de carpetas destino incluyendo 
+	donde van los resultados de las pruebas	
+	-->
+	
+	<target name="clean">
+			<delete dir="${destFolder}"/>
+			<delete dir="${testResultsFolder}"/>	
+			<mkdir dir="${destFolder}"/>
+			<mkdir dir="${testResultsFolder}"/>
+	</target>
+	
+	<target name="compile" depends="clean">
+		<javac 	srcdir="${sourceFolder}"
+				destdir="${destFolder}"
+				includeantruntime="No"
+				classpath=""
+				source="1.6"/>
+	</target>
+	
+	<!-- task: definir un target para compilar las pruebas unitarias, que dependa de los anteriores y que 
+	sea ejecutado desde el principios
+	Tip: Se parece mucho al anterior compile solo tiene que considerar el classpath de la libreria JUnit
+	-->
+	<target name="compileTests" depends="compile"> 
+		<javac 	srcdir="${testFolder}"
+				destdir="${destFolder}"
+				includeantruntime="No"
+				classpath="${junitJar};${destFolder}"
+		 />	
+	</target>
+	
+	<target name="runTests" depends="compileTests">
+			<junit printsummary="on" haltonfailure="false">
+				<batchtest fork="yes" todir="${testResultsFolder}">
+					<fileset dir="${destFolder}" includes="**/*Test*.class"/>
+					<formatter type="xml"/>
+				</batchtest>
+				<classpath>
+					<pathelement location="${junitJar}"/>
+				</classpath>
+			</junit>
+		</target>
+	
+</project>
